@@ -36,8 +36,8 @@ struct DecoyNotesListView: View {
                         }
                     }
                     .padding(.horizontal, 18)
-                    .padding(.top, geo.size.height * 0.10)   // ← 1/10th of screen
-                    .padding(.bottom, 40)
+                    .padding(.top, geo.size.height * 0.10)
+                    .padding(.bottom, 60)
                 }
             }
             .themedBackground()
@@ -66,9 +66,8 @@ struct DecoyNotesListView: View {
 
                     let id = vm.createNote(title: cleaned.isEmpty ? "New Note" : cleaned)
                     vm.bindingBody(for: id).wrappedValue = body
-                    showingNewNote = false
-                    vm.openNote(id)
-                    path.append(id)
+
+                    showingNewNote = false   // ← returns to main page
                 }
             }
             .navigationDestination(for: UUID.self) { noteID in

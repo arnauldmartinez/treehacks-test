@@ -1,43 +1,85 @@
-//
-//  SecureHomeView.swift
-//  treehacks
-//
-//  Created by Jacob Schuster on 2/14/26.
-//
-
 import SwiftUI
 
 struct SecureHomeView: View {
     @EnvironmentObject private var appState: AppState
 
+    private let columns = [
+        GridItem(.adaptive(minimum: 150), spacing: 16)
+    ]
+
     var body: some View {
         NavigationStack {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Secure")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundStyle(Theme.text)
 
-                AppCard {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Basic secure page")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(Theme.text)
-                        Text("Next: tiles for Documents / AI Agent / Forum / Emergency / Chats.")
-                            .font(.system(size: 13))
-                            .foregroundStyle(Theme.sub)
+            ScrollView {
+                LazyVGrid(columns: columns, spacing: 16) {
+
+                    SecureTile(title: "Documents", systemImage: "doc.text") {
+                        DocumentsPlaceholderView()
+                    }
+
+                    SecureTile(title: "AI Support", systemImage: "brain.head.profile") {
+                        AISupportPlaceholderView()
+                    }
+
+                    SecureTile(title: "Forums", systemImage: "person.3") {
+                        ForumsPlaceholderView()
+                    }
+
+                    SecureTile(title: "Emergency", systemImage: "exclamationmark.triangle") {
+                        EmergencyPlaceholderView()
+                    }
+
+                    SecureTile(title: "Chats", systemImage: "bubble.left.and.bubble.right") {
+                        ChatsPlaceholderView()
                     }
                 }
-
-                Spacer()
+                .padding(.horizontal, 18)
+                .padding(.top, 60)
+                .padding(.bottom, 60)
             }
-            .padding(18)
             .themedBackground()
-            .navigationTitle("Notes")
+            .navigationTitle("Secure")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
-                    Button("Lock") { appState.lockToDecoy() }
+                    Button("Lock") {
+                        appState.lockToDecoy()
+                    }
                 }
             }
         }
+    }
+}
+
+private struct SecureTile<Destination: View>: View {
+    let title: String
+    let systemImage: String
+    let destination: Destination
+
+    init(title: String, systemImage: String, @ViewBuilder destination: () -> Destination) {
+        self.title = title
+        self.systemImage = systemImage
+        self.destination = destination()
+    }
+
+    var body: some View {
+        NavigationLink {
+            destination
+                .themedBackground()
+        } label: {
+            AppCard {
+                VStack(spacing: 12) {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 28))
+                        .foregroundStyle(Theme.text)
+
+                    Text(title)
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Theme.text)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }

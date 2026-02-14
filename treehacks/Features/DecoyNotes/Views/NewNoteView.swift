@@ -13,13 +13,13 @@ struct NewNoteView: View {
             ScrollView {
                 VStack(spacing: 24) {
 
-                    Spacer(minLength: 60)   // ← slightly lower than before
+                    Spacer(minLength: 60)
 
                     AppCard {
                         VStack(alignment: .leading, spacing: 12) {
 
                             TextField("Title", text: $title)
-                                .font(.system(size: 18, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                                 .foregroundStyle(Theme.text)
                                 .textFieldStyle(.plain)
 
@@ -28,7 +28,7 @@ struct NewNoteView: View {
                                 .frame(height: 1)
 
                             TextEditor(text: $bodyText)
-                                .font(.system(size: 15))
+                                .font(.system(size: 14))
                                 .foregroundStyle(Theme.text)
                                 .scrollContentBackground(.hidden)
                                 .background(Color.clear)
@@ -37,9 +37,8 @@ struct NewNoteView: View {
                     }
                     .padding(.horizontal, 18)
 
-                    Spacer(minLength: 40)
+                    Spacer(minLength: 60)
                 }
-                .padding(.top, 12)
             }
             .themedBackground()
             .navigationTitle("")
@@ -49,7 +48,10 @@ struct NewNoteView: View {
                     Button("Cancel") { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") { onSubmit(title, bodyText) }
+                    Button("Save") {
+                        onSubmit(title, bodyText)
+                        dismiss()
+                    }
                 }
             }
         }
