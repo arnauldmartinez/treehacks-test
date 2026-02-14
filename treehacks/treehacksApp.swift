@@ -8,10 +8,13 @@
 import SwiftUI
 
 @main
-struct treehacksApp: App {
+struct TreehacksApp: App {
+    @StateObject private var appState = AppState()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppRouter()
+                .environmentObject(appState)
         }
     }
 }
