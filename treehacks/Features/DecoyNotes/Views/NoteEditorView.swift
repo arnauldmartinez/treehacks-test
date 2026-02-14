@@ -1,10 +1,3 @@
-//
-//  NoteEditorView.swift
-//  treehacks
-//
-//  Created by Jacob Schuster on 2/14/26.
-//
-
 import SwiftUI
 
 struct NoteEditorView: View {
@@ -12,17 +5,25 @@ struct NoteEditorView: View {
     let noteID: UUID
 
     var body: some View {
-        VStack(spacing: 12) {
-            AppCard {
-                TextEditor(text: vm.bindingBody(for: noteID))
-                    .font(.system(size: 14))
-                    .foregroundStyle(Theme.text)
-                    .frame(minHeight: 260)
-            }
-            .padding(.horizontal, 18)
-            .padding(.top, 14)
+        ScrollView {
 
-            Spacer()
+            VStack(spacing: 24) {
+
+                Spacer(minLength: 24)   // ← push content below nav title
+
+                AppCard {
+                    TextEditor(text: vm.bindingBody(for: noteID))
+                        .font(.system(size: 15))
+                        .foregroundStyle(Theme.text)
+                        .scrollContentBackground(.hidden)
+                        .background(Color.clear)
+                        .frame(minHeight: 280)
+                }
+                .padding(.horizontal, 18)
+
+                Spacer(minLength: 40)
+            }
+            .padding(.top, 32)   // extra breathing room
         }
         .themedBackground()
         .navigationTitle(vm.bindingTitle(for: noteID).wrappedValue)

@@ -1,10 +1,3 @@
-//
-//  AppCard.swift
-//  treehacks
-//
-//  Created by Jacob Schuster on 2/14/26.
-//
-
 import SwiftUI
 
 struct AppCard<Content: View>: View {
@@ -15,12 +8,18 @@ struct AppCard<Content: View>: View {
     }
 
     var body: some View {
-        RoundedRectangle(cornerRadius: 12, style: .continuous)
-            .fill(Theme.card)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(Theme.line, lineWidth: 1)
-            )
-            .overlay(content.padding(14), alignment: .topLeading)
+        ZStack {
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Theme.tileFill)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(Theme.tileStroke, lineWidth: 1)
+                )
+                .shadow(color: Theme.tileShadow, radius: 10, x: 0, y: 6)
+
+            content
+                .padding(16)
+        }
+        .frame(maxWidth: .infinity)
     }
 }

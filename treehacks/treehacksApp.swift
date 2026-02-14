@@ -15,6 +15,7 @@ struct TreehacksApp: App {
         WindowGroup {
             AppRouter()
                 .environmentObject(appState)
+                .tint(Theme.accent)
         }
     }
 }
