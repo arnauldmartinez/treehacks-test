@@ -7,6 +7,8 @@
 
 // sample change
 
+
+// JACOB WAS HERE
 import SwiftUI
 
 struct ContentView: View {
@@ -19,8 +21,4 @@ struct ContentView: View {
         }
         .padding()
     }
-}
-
-#Preview {
-    ContentView()
 }
