@@ -14,7 +14,7 @@ struct SecureHomeView: View {
                 LazyVGrid(columns: columns, spacing: 16) {
 
                     SecureTile(title: "Documents", systemImage: "doc.text") {
-                        DocumentsPlaceholderView()
+                        DocumentsView()
                     }
 
                     SecureTile(title: "AI Support", systemImage: "brain.head.profile") {
