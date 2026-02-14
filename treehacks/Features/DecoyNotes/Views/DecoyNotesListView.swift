@@ -7,6 +7,14 @@ struct DecoyNotesListView: View {
     @State private var path = NavigationPath()
     @State private var showingNewNote = false
 
+    private static let ddMMyyFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.calendar = Calendar(identifier: .gregorian)
+        f.locale = Locale(identifier: "en_US_POSIX")
+        f.dateFormat = "dd/MM/yy"
+        return f
+    }()
+
     var body: some View {
         NavigationStack(path: $path) {
 
@@ -21,15 +29,25 @@ struct DecoyNotesListView: View {
                             } label: {
                                 AppCard {
                                     VStack(alignment: .leading, spacing: 8) {
-                                        Text(note.title)
-                                            .font(.system(size: 17, weight: .semibold))
-                                            .foregroundStyle(Theme.text)
+                                        HStack(alignment: .firstTextBaseline) {
+                                            Text(note.title)
+                                                .font(.system(size: 17, weight: .semibold))
+                                                .foregroundStyle(Theme.text)
+                                                .lineLimit(1)
+
+                                            Spacer(minLength: 8)
+
+                                            Text(Self.ddMMyyFormatter.string(from: note.updatedAt))
+                                                .font(.system(size: 12))
+                                                .foregroundStyle(Theme.sub)
+                                        }
 
                                         Text(note.body.isEmpty ? "No additional text" : note.body)
                                             .font(.system(size: 14))
                                             .foregroundStyle(Theme.sub)
                                             .lineLimit(3)
                                     }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                             }
                             .buttonStyle(.plain)
@@ -48,9 +66,11 @@ struct DecoyNotesListView: View {
                     Button {
                         showingNewNote = true
                     } label: {
-                        Image(systemName: "plus.circle.fill")
+                        Image(systemName: "plus")
                             .font(.system(size: 22))
+                            .foregroundStyle(Theme.accent)
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .tint(Theme.accent)
@@ -77,3 +97,4 @@ struct DecoyNotesListView: View {
         }
     }
 }
+
