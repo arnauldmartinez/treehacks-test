@@ -3,8 +3,7 @@ import SwiftUI
 struct DocumentsView: View {
 
     @StateObject private var vm = SecureEventsViewModel()
-    @State private var showingNewEvent = false
-    @State private var path = NavigationPath()
+    @State private var goToNewEvent = false
 
     private static let ddMMyyFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -15,15 +14,16 @@ struct DocumentsView: View {
     }()
 
     var body: some View {
-        NavigationStack(path: $path) {
+        ZStack {
 
             GeometryReader { geo in
                 ScrollView {
                     LazyVStack(spacing: 16) {
 
                         ForEach(vm.sortedEvents) { event in
-                            Button {
-                                path.append(event.id)
+                            NavigationLink {
+                                EventEditorView(eventID: event.id)
+                                    .environmentObject(vm)
                             } label: {
                                 AppCard {
                                     VStack(alignment: .leading, spacing: 8) {
@@ -44,6 +44,19 @@ struct DocumentsView: View {
                                             .font(.system(size: 14))
                                             .foregroundStyle(Theme.sub)
                                             .lineLimit(3)
+
+                                        HStack(spacing: 12) {
+                                            if !event.photoFileNames.isEmpty {
+                                                Label("\(event.photoFileNames.count)", systemImage: "photo")
+                                                    .font(.system(size: 12))
+                                                    .foregroundStyle(Theme.sub)
+                                            }
+                                            if !event.audioFileNames.isEmpty {
+                                                Label("\(event.audioFileNames.count)", systemImage: "waveform")
+                                                    .font(.system(size: 12))
+                                                    .foregroundStyle(Theme.sub)
+                                            }
+                                        }
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 }
@@ -56,35 +69,34 @@ struct DocumentsView: View {
                     .padding(.bottom, 60)
                 }
             }
-            .themedBackground()
-            .navigationTitle("Events")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showingNewEvent = true
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(size: 22))
-                            .foregroundStyle(Theme.accent)
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .tint(Theme.accent)
-            .sheet(isPresented: $showingNewEvent) {
-                NewEventView { title, body in
+            NavigationLink(isActive: $goToNewEvent) {
+                NewEventView { title, body, photos, audios in
                     let cleaned = title.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
                     vm.createEvent(
                         title: cleaned.isEmpty ? "Untitled Event" : cleaned,
-                        body: body
+                        body: body,
+                        photoDatas: photos,
+                        audioDatas: audios
                     )
                 }
-            }
-            .navigationDestination(for: UUID.self) { eventID in
-                EventEditorView(eventID: eventID)
-                    .environmentObject(vm)
+            } label: { EmptyView() }
+            .hidden()
+        }
+        .themedBackground()
+        .navigationTitle("Events")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    goToNewEvent = true
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 22))
+                        .foregroundStyle(Theme.accent)
+                }
+                .buttonStyle(.plain)
             }
         }
+        .tint(Theme.accent)
     }
 }
