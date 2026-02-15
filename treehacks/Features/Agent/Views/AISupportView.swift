@@ -62,7 +62,6 @@ struct AISupportPlaceholderView: View {
                     }
                 }
 
-                // Input bar positioned about 15% from the bottom
                 HStack(alignment: .center, spacing: 12) {
                     if let data = attachedImageData, let uiImage = UIImage(data: data) {
                         Image(uiImage: uiImage)

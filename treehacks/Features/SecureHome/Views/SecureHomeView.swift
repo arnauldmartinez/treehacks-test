@@ -40,7 +40,7 @@ struct SecureHomeView: View {
                     
                 }
                 .padding(.horizontal, 18)
-                .padding(.top, 60)
+                .padding(.top, 90)
                 .padding(.bottom, 60)
             }
             .themedBackground()
