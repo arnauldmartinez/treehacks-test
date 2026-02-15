@@ -4,4 +4,10 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:ChatAPIClient.swift">
+   </FileRef>
+   <FileRef
+      location = "group:DrKhanChatViewModel.swift">
+   </FileRef>
 </Workspace>

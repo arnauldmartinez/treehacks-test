@@ -294,6 +294,7 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "need to use microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "need to add photos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "need to access photos";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -342,6 +343,7 @@
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "need to use microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "need to add photos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "need to access photos";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
