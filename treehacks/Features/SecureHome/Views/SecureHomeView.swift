@@ -32,6 +32,12 @@ struct SecureHomeView: View {
                     SecureTile(title: "Chats", systemImage: "bubble.left.and.bubble.right") {
                         ChatsPlaceholderView()
                     }
+                    
+                    SecureTile(title: "Threat Test", systemImage: "waveform.path.ecg") {
+                        ThreatMonitorTestView()
+                    }
+                    
+                    
                 }
                 .padding(.horizontal, 18)
                 .padding(.top, 60)
