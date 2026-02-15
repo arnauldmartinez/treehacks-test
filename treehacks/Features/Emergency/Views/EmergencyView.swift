@@ -1,12 +1,7 @@
 import SwiftUI
-#if canImport(MessageUI)
-import MessageUI
-#endif
 
 struct EmergencyPlaceholderView: View {
     @Environment(\.openURL) private var openURL
-    @State private var showSMSComposer = false
-    @State private var showSMSError = false
 
     var body: some View {
         ScrollView {
@@ -29,15 +24,7 @@ struct EmergencyPlaceholderView: View {
 
                 // Bottom button: Silently Notify Authorities
                 Button(action: {
-                    #if canImport(MessageUI)
-                    if MFMessageComposeViewController.canSendText() {
-                        showSMSComposer = true
-                    } else {
-                        showSMSError = true
-                    }
-                    #else
-                    showSMSError = true
-                    #endif
+                    sendSilentCall()
                 }) {
                     AppCard {
                         Text("Silently Notify Authorities")
@@ -53,20 +40,17 @@ struct EmergencyPlaceholderView: View {
             .padding(.top, 90)
             .padding(.bottom, 60)
         }
-        .sheet(isPresented: $showSMSComposer) {
-            MessageComposer(
-                recipients: ["8572189851"],
-                bodyText: "User is threatened, call authorities"
-            )
-        }
-        .alert("Messaging not available", isPresented: $showSMSError) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text("This device is not configured to send text messages.")
-        }
         .themedBackground()
         .navigationTitle("Emergency")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func sendSilentCall() {
+        guard let url = URL(string: "http://10.19.180.135:8000/users/1/silent_call") else { return }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        URLSession.shared.dataTask(with: request).resume()
+        print("📡 Silent notify POST issued")
     }
 }
 

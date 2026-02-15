@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 import AVFoundation
 import Combine
+import PhotosUI
 
 struct NewEventView: View {
 
@@ -33,10 +34,18 @@ struct NewEventView: View {
                     AppCard {
                         VStack(alignment: .leading, spacing: 12) {
 
-                            TextField("Event Title", text: $title)
-                                .font(.system(size: 22, weight: .bold))
-                                .foregroundStyle(Theme.text)
-                                .textFieldStyle(.plain)
+                            ZStack(alignment: .leading) {
+                                if title.isEmpty {
+                                    Text("Event Title")
+                                        .font(.system(size: 22, weight: .bold))
+                                        .foregroundStyle(Theme.text)
+                                }
+                                TextField("", text: $title)
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundStyle(Theme.text)
+                                    .textFieldStyle(.plain)
+                                    .tint(Theme.text)
+                            }
 
                             Rectangle()
                                 .fill(Theme.line)
@@ -170,6 +179,7 @@ struct NewEventView: View {
                         }
                     }
                     .padding(.horizontal, 18)
+                    .padding(.top, 165)
 
                     Spacer(minLength: 60)
                 }
@@ -194,7 +204,7 @@ struct NewEventView: View {
                 VStack(spacing: 16) {
                     Text("Add Image")
                         .font(.headline)
-                        .foregroundStyle(Theme.text)
+                        .foregroundStyle(.black)
                         .frame(maxWidth: .infinity, alignment: .leading)
 
                     Button {
@@ -211,7 +221,7 @@ struct NewEventView: View {
                         Text("Take Photo")
                             .font(.system(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Theme.bgBase)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.text)
@@ -225,12 +235,14 @@ struct NewEventView: View {
                         Text("Choose from Library")
                             .font(.system(size: 16, weight: .semibold))
                             .frame(maxWidth: .infinity)
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Theme.bgBase)
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(Theme.text)
                 }
                 .padding(20)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Theme.bgBase)
             }
             .sheet(isPresented: $showCameraPicker) {
                 ImagePicker(sourceType: .camera) { data in

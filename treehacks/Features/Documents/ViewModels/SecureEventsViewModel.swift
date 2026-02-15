@@ -1,8 +1,12 @@
 import SwiftUI
 import Combine
+import Foundation
 
 @MainActor
 final class SecureEventsViewModel: ObservableObject {
+
+    // Notification for external updates so any active view models can reload
+    static let eventsUpdatedNotification = Notification.Name("secure_events_updated")
 
     @Published private(set) var events: [SecureEvent] = [] {
         didSet {
@@ -11,6 +15,7 @@ final class SecureEventsViewModel: ObservableObject {
     }
 
     private let storageKey = "secure_events_storage"
+    private var externalUpdatesObserver: NSObjectProtocol?
 
     // MARK: - File Storage (Documents directory)
     private var documentsURL: URL {
@@ -33,6 +38,16 @@ final class SecureEventsViewModel: ObservableObject {
 
     init() {
         load()
+        externalUpdatesObserver = NotificationCenter.default.addObserver(forName: Self.eventsUpdatedNotification, object: nil, queue: .main) { [weak self] _ in
+            print("[SecureEvents] Received external update notification — reloading from disk")
+            self?.load()
+        }
+    }
+
+    deinit {
+        if let token = externalUpdatesObserver {
+            NotificationCenter.default.removeObserver(token)
+        }
     }
 
     var sortedEvents: [SecureEvent] {
@@ -166,6 +181,64 @@ final class SecureEventsViewModel: ObservableObject {
         }
 
         events = decoded
+    }
+
+    // MARK: - Static helpers for background saves
+    /// Load events directly from persistent storage (UserDefaults)
+    private static func loadEventsFromDisk() -> [SecureEvent] {
+        guard
+            let data = UserDefaults.standard.data(forKey: "secure_events_storage"),
+            let decoded = try? JSONDecoder().decode([SecureEvent].self, from: data)
+        else {
+            return []
+        }
+        return decoded
+    }
+
+    /// Save events directly to persistent storage (UserDefaults)
+    private static func saveEventsToDisk(_ events: [SecureEvent]) {
+        do {
+            let data = try JSONEncoder().encode(events)
+            UserDefaults.standard.set(data, forKey: "secure_events_storage")
+        } catch {
+            print("Failed to save secure events:", error)
+        }
+    }
+
+    /// Append a generic incident with a custom title, transcript and timestamp.
+    static func appendIncident(title: String, transcript: String, timestamp: Date = Date()) {
+        var events = loadEventsFromDisk()
+        let beforeCount = events.count
+
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        let when = formatter.string(from: timestamp)
+
+        let body = "Timestamp: \(when)\n\nTranscript:\n\(transcript)"
+
+        let newEvent = SecureEvent(
+            id: UUID(),
+            title: title,
+            body: body,
+            updatedAt: timestamp,
+            photoFileNames: [],
+            audioFileNames: []
+        )
+
+        events.insert(newEvent, at: 0)
+        saveEventsToDisk(events)
+
+        print("[SecureEvents] Appended incident '", title, "' (transcript length: \(transcript.count)). Events before: \(beforeCount), after: \(events.count)")
+        NotificationCenter.default.post(name: eventsUpdatedNotification, object: nil)
+        print("[SecureEvents] Posted eventsUpdatedNotification")
+    }
+
+    /// Append a verbal abuse incident as a new event with transcript and timestamp.
+    static func appendVerbalAbuseIncident(transcript: String, timestamp: Date = Date()) {
+        appendIncident(title: "Verbal Abuse Incident", transcript: transcript, timestamp: timestamp)
     }
 }
 

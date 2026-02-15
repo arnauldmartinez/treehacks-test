@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		157F85AA2F41B3F8005BEB8F /* ForumsPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157F85A92F41B3F8005BEB8F /* ForumsPlaceholderView.swift */; };
 		157F85AC2F41B77C005BEB8F /* MessageComposer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157F85AB2F41B77C005BEB8F /* MessageComposer.swift */; };
+		157F85AE2F41BBB4005BEB8F /* FacePresenceMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157F85AD2F41BBB4005BEB8F /* FacePresenceMonitor.swift */; };
+		157F85B02F41C473005BEB8F /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157F85AF2F41C473005BEB8F /* KeyboardObserver.swift */; };
+		157F85B42F41CADD005BEB8F /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 157F85B32F41CADD005BEB8F /* KeyboardObserver.swift */; };
 		15F7F8E72F413ABD009878CD /* AudioRecorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F7F8E62F413ABD009878CD /* AudioRecorder.swift */; };
 		15F7F8E92F413B87009878CD /* AudioRecorder 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F7F8E82F413B87009878CD /* AudioRecorder 2.swift */; };
 		15F7F8ED2F414393009878CD /* AudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15F7F8EC2F414393009878CD /* AudioPlayer.swift */; };
@@ -19,6 +22,9 @@
 /* Begin PBXFileReference section */
 		157F85A92F41B3F8005BEB8F /* ForumsPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumsPlaceholderView.swift; sourceTree = "<group>"; };
 		157F85AB2F41B77C005BEB8F /* MessageComposer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageComposer.swift; sourceTree = "<group>"; };
+		157F85AD2F41BBB4005BEB8F /* FacePresenceMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FacePresenceMonitor.swift; sourceTree = "<group>"; };
+		157F85AF2F41C473005BEB8F /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
+		157F85B32F41CADD005BEB8F /* KeyboardObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		15B309482F4061DE00AFD946 /* treehacks.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = treehacks.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		15F7F8E62F413ABD009878CD /* AudioRecorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioRecorder.swift; sourceTree = "<group>"; };
 		15F7F8E82F413B87009878CD /* AudioRecorder 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AudioRecorder 2.swift"; sourceTree = "<group>"; };
@@ -71,6 +77,9 @@
 				15F7F90D2F415DC4009878CD /* AISupportViewModel.swift */,
 				157F85A92F41B3F8005BEB8F /* ForumsPlaceholderView.swift */,
 				157F85AB2F41B77C005BEB8F /* MessageComposer.swift */,
+				157F85AD2F41BBB4005BEB8F /* FacePresenceMonitor.swift */,
+				157F85AF2F41C473005BEB8F /* KeyboardObserver.swift */,
+				157F85B32F41CADD005BEB8F /* KeyboardObserver.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -160,6 +169,9 @@
 				15F7F8E92F413B87009878CD /* AudioRecorder 2.swift in Sources */,
 				157F85AA2F41B3F8005BEB8F /* ForumsPlaceholderView.swift in Sources */,
 				157F85AC2F41B77C005BEB8F /* MessageComposer.swift in Sources */,
+				157F85B02F41C473005BEB8F /* KeyboardObserver.swift in Sources */,
+				157F85B42F41CADD005BEB8F /* KeyboardObserver.swift in Sources */,
+				157F85AE2F41BBB4005BEB8F /* FacePresenceMonitor.swift in Sources */,
 				15F7F8ED2F414393009878CD /* AudioPlayer.swift in Sources */,
 				15F7F90E2F415DC4009878CD /* AISupportViewModel.swift in Sources */,
 				15F7F8E72F413ABD009878CD /* AudioRecorder.swift in Sources */,
@@ -299,6 +311,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = treehacks/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Violet Notes";
+				INFOPLIST_KEY_NSCameraUsageDescription = "need to access camera pls";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "need to use microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "need to add photos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "need to access photos";
@@ -348,6 +362,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = treehacks/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Violet Notes";
+				INFOPLIST_KEY_NSCameraUsageDescription = "need to access camera pls";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "need to use microphone";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "need to add photos";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "need to access photos";

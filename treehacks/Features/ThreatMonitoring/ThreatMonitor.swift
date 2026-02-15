@@ -24,6 +24,7 @@ final class ThreatMonitor: NSObject, ObservableObject {
     private let amplitudeGate = AmplitudeGate()
     private let recorder = IncidentRecorder()
     private let analyzer: ThreatAnalysisService = OpenAIThreatAnalyzer()
+    private let localClassifier = ThreatClassifier()
 
     // MARK: Timers
 
@@ -38,6 +39,8 @@ final class ThreatMonitor: NSObject, ObservableObject {
     private var episodeContainsAbuse = false
     private var episodeContainsThreat = false
     private var hasSentThreatToServer = false
+    private var isStartingEscalation = false
+    private var incidentSavedThisEpisode = false
 
     // MARK: UI State
 
@@ -120,8 +123,14 @@ final class ThreatMonitor: NSObject, ObservableObject {
     }
 
     private func startEscalation(format: AVAudioFormat) {
+        guard stage != .escalationActive && !isStartingEscalation else {
+            print("[ThreatMonitor] startEscalation() ignored — already active or starting")
+            return
+        }
+        isStartingEscalation = true
 
         stage = .escalationActive
+        print("[ThreatMonitor] Escalation started")
 
         transcriptBuffer = ""
         transcriptLive = ""
@@ -129,6 +138,7 @@ final class ThreatMonitor: NSObject, ObservableObject {
         episodeContainsAbuse = false
         episodeContainsThreat = false
         hasSentThreatToServer = false
+        incidentSavedThisEpisode = false
 
         recorder.start(format: format)
 
@@ -137,9 +147,14 @@ final class ThreatMonitor: NSObject, ObservableObject {
         recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest!) { result, _ in
 
             if let result = result {
-
                 let text = result.bestTranscription.formattedString
 
+                if self.stage != .escalationActive {
+                    print("[ThreatMonitor] Ignoring transcript update after escalation ended (len: \(text.count))")
+                    return
+                }
+
+                print("[ThreatMonitor] Live transcript updated (\(text.count) chars)")
                 self.transcriptLive = text
                 self.transcriptBuffer = text
 
@@ -148,13 +163,34 @@ final class ThreatMonitor: NSObject, ObservableObject {
         }
 
         resetSilenceTimer()
+        isStartingEscalation = false
     }
 
     private func evaluateWithLLMIfNeeded(text: String) {
+        guard stage == .escalationActive else {
+            print("[ThreatMonitor] Skipping LLM eval — stage is not escalationActive")
+            return
+        }
 
         let now = Date()
-        guard now.timeIntervalSince(lastLLMCheckTime) > 2.0 else { return }
+        guard now.timeIntervalSince(lastLLMCheckTime) > 1.0 else { return }
         lastLLMCheckTime = now
+
+        // Fast local keyword-based classification to avoid missing threats before LLM returns
+        let signals = localClassifier.evaluate(text: text)
+        if signals.threatScore > 0 {
+            let classification: ThreatLevel = signals.veryHigh ? .imminentThreat : .verbalAbuse
+            let assessment = ThreatAssessment(
+                classification: classification,
+                confidence: min(1.0, signals.threatScore / 10.0),
+                policeLevel: Int(min(10.0, signals.threatScore)),
+                evidenceSpans: []
+            )
+            print("[ThreatMonitor] Local classifier triggered: score=\(signals.threatScore), veryHigh=\(signals.veryHigh) -> \(classification.rawValue)")
+            DispatchQueue.main.async {
+                self.handleAssessment(assessment)
+            }
+        }
 
         Task {
             do {
@@ -175,25 +211,44 @@ final class ThreatMonitor: NSObject, ObservableObject {
         switch assessment.classification {
 
         case .noConcern:
+            print("[ThreatMonitor] Assessment: noConcern (confidence: \(assessment.confidence))")
             showDecision("No Threat Detected")
-            break
 
         case .verbalAbuse:
             episodeContainsAbuse = true
+            print("[ThreatMonitor] Assessment: verbalAbuse (confidence: \(assessment.confidence)). Marking episodeContainsAbuse = true")
             showDecision("Verbal Abuse — Will Save")
-            
+
+            if !incidentSavedThisEpisode {
+                incidentSavedThisEpisode = true
+                print("[ThreatMonitor] Immediate save on verbal abuse (len: \(transcriptBuffer.count))")
+                SecureEventsViewModel.appendVerbalAbuseIncident(transcript: transcriptBuffer, timestamp: Date())
+            } else {
+                print("[ThreatMonitor] Incident already saved for this episode — skipping immediate save")
+            }
+
         case .imminentThreat:
             episodeContainsAbuse = true
             episodeContainsThreat = true
+            print("[ThreatMonitor] Assessment: imminentThreat (confidence: \(assessment.confidence)). Flags: abuse=true threat=true")
 
             showDecision("🚨 IMMINENT THREAT — Escalated")
 
             if !hasSentThreatToServer {
                 hasSentThreatToServer = true
+                print("[ThreatMonitor] Sending imminent threat to server now…")
                 sendToServerNow(transcript: transcriptBuffer)
+            }
+
+            // Also persist locally so user has a record in Documents
+            if !incidentSavedThisEpisode {
+                incidentSavedThisEpisode = true
+                print("[ThreatMonitor] Immediate save on imminent threat (len: \(transcriptBuffer.count))")
+                SecureEventsViewModel.appendVerbalAbuseIncident(transcript: transcriptBuffer, timestamp: Date())
             }
         }
 
+        print("[ThreatMonitor] Transcript buffer length: \(transcriptBuffer.count)")
         resetSilenceTimer()
     }
 
@@ -208,7 +263,7 @@ final class ThreatMonitor: NSObject, ObservableObject {
 
     private func sendToServerNow(transcript: String) {
 
-        guard let url = URL(string: "http://10.19.178.83:8000/report") else { return }
+        guard let url = URL(string: "http://10.19.180.135:8000/report") else { return }
 
         let payload: [String: Any] = [
             "transcript": transcript,
@@ -223,6 +278,18 @@ final class ThreatMonitor: NSObject, ObservableObject {
         URLSession.shared.dataTask(with: request).resume()
 
         print("🚨 Threat sent to server")
+    }
+
+    private func sendSilentCallToServer() {
+
+        guard let url = URL(string: "http://10.19.180.135:8000/users/1/silent_call") else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+
+        URLSession.shared.dataTask(with: request).resume()
+
+        print("📡 Silent call POST issued")
     }
 
     private func resetSilenceTimer() {
@@ -244,6 +311,8 @@ final class ThreatMonitor: NSObject, ObservableObject {
 
     private func endEscalation() {
 
+        print("[ThreatMonitor] endEscalation() called. stage=\(stage) abuse=\(episodeContainsAbuse) threat=\(episodeContainsThreat)")
+
         guard stage == .escalationActive else { return }
 
         silenceTimer?.cancel()
@@ -255,9 +324,19 @@ final class ThreatMonitor: NSObject, ObservableObject {
 
         if episodeContainsAbuse {
 
+            // Save the audio file info for UI feedback
             if let url = recorder.url {
                 lastIncidentFileName = url.lastPathComponent
                 print("Saved incident: \(url)")
+            }
+
+            // Persist a new document entry with transcript + timestamp for verbal abuse incidents (fallback if not already saved)
+            if !incidentSavedThisEpisode {
+                incidentSavedThisEpisode = true
+                print("[ThreatMonitor] Fallback save at endEscalation (len: \(transcriptBuffer.count))")
+                SecureEventsViewModel.appendVerbalAbuseIncident(transcript: transcriptBuffer, timestamp: Date())
+            } else {
+                print("[ThreatMonitor] Skipping fallback save — already saved during assessment")
             }
 
         } else {
@@ -268,6 +347,7 @@ final class ThreatMonitor: NSObject, ObservableObject {
             }
         }
 
+        incidentSavedThisEpisode = false
         stage = .amplitudeMonitoring
     }
 
@@ -282,3 +362,4 @@ final class ThreatMonitor: NSObject, ObservableObject {
         stage = .amplitudeMonitoring
     }
 }
+

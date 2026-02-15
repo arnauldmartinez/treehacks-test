@@ -18,10 +18,18 @@ struct NewNoteView: View {
                     AppCard {
                         VStack(alignment: .leading, spacing: 12) {
 
-                            TextField("Title", text: $title)
-                                .font(.system(size: 17, weight: .semibold))
-                                .foregroundStyle(Theme.text)
-                                .textFieldStyle(.plain)
+                            ZStack(alignment: .leading) {
+                                if title.isEmpty {
+                                    Text("Title")
+                                        .font(.system(size: 17, weight: .semibold))
+                                        .foregroundStyle(Theme.text)
+                                }
+                                TextField("", text: $title)
+                                    .font(.system(size: 17, weight: .semibold))
+                                    .foregroundStyle(Theme.text)
+                                    .textFieldStyle(.plain)
+                                    .tint(Theme.text)
+                            }
 
                             Rectangle()
                                 .fill(Theme.line)
@@ -29,13 +37,16 @@ struct NewNoteView: View {
 
                             TextEditor(text: $bodyText)
                                 .font(.system(size: 14))
+                                .foregroundColor(Theme.text)
                                 .foregroundStyle(Theme.text)
+                                .tint(Theme.text)
                                 .scrollContentBackground(.hidden)
                                 .background(Color.clear)
                                 .frame(minHeight: 260)
                         }
                     }
                     .padding(.horizontal, 18)
+                    .padding(.top, 180)   // extra breathing room
 
                     Spacer(minLength: 60)
                 }
@@ -57,3 +68,4 @@ struct NewNoteView: View {
         }
     }
 }
+

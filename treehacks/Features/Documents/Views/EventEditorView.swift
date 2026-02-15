@@ -181,6 +181,7 @@ struct EventEditorView: View {
                     }
                 }
                 .padding(.horizontal, 18)
+                .padding(.top, 165)
 
                 Spacer(minLength: 60)
             }
@@ -203,7 +204,7 @@ struct EventEditorView: View {
             VStack(spacing: 16) {
                 Text("Add Image")
                     .font(.headline)
-                    .foregroundStyle(Theme.text)
+                    .foregroundStyle(.black)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button {
@@ -220,7 +221,7 @@ struct EventEditorView: View {
                     Text("Take Photo")
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Theme.bgBase)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.text)
@@ -234,12 +235,14 @@ struct EventEditorView: View {
                     Text("Choose from Library")
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(Theme.bgBase)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(Theme.text)
             }
             .padding(20)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Theme.bgBase)
         }
         .sheet(isPresented: $showCameraPicker) {
             ImagePicker(sourceType: .camera) { data in

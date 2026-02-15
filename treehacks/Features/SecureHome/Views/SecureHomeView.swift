@@ -1,6 +1,9 @@
 import SwiftUI
 
 struct SecureHomeView: View {
+    @StateObject private var faceMonitor = FacePresenceMonitor()
+    @State private var lockCountdown: Int = 0
+    @State private var countdownTimer: Timer? = nil
     @EnvironmentObject private var appState: AppState
 
     private let columns = [
@@ -53,6 +56,52 @@ struct SecureHomeView: View {
                     }
                 }
             }
+            .overlay(alignment: .bottom) {
+                if lockCountdown > 0 {
+                    GeometryReader { geo in
+                        VStack {
+                            Spacer()
+                            AppCard {
+                                Text("Face not detected — auto-locking in \(lockCountdown)s")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(Theme.text)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(.vertical, 4)
+                            }
+                            .frame(height: geo.size.height * 0.05) // 5% tall
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 18)
+                            .padding(.bottom, 80) // keep it slightly above the exact bottom
+                        }
+                    }
+                }
+            }
+        }
+        .onAppear { faceMonitor.start() }
+        .onDisappear { faceMonitor.stop() }
+        .onChange(of: faceMonitor.facePresent) { present in
+            if present {
+                countdownTimer?.invalidate()
+                countdownTimer = nil
+                lockCountdown = 0
+            } else {
+                startCountdown()
+            }
+        }
+    }
+    
+    private func startCountdown() {
+        guard countdownTimer == nil else { return }
+        lockCountdown = 3 // seconds
+        countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
+            if lockCountdown > 1 {
+                lockCountdown -= 1
+            } else {
+                countdownTimer?.invalidate()
+                countdownTimer = nil
+                lockCountdown = 0
+                appState.lockToDecoy()
+            }
         }
     }
 }
@@ -89,3 +138,4 @@ private struct SecureTile<Destination: View>: View {
         .buttonStyle(.plain)
     }
 }
+

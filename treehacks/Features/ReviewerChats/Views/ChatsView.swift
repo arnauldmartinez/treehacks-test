@@ -342,8 +342,8 @@ final class DrKhanInlineVM: ObservableObject {
     private var seenAssistantMessageIDs = Set<String>()
 
     private let userId = "1"
-    private let restBase = URL(string: "http://10.19.178.83:8000")!
-    private let wsURL = URL(string: "ws://10.19.178.83:8000/ws")!
+    private let restBase = URL(string: "http://10.19.180.135:8000")!
+    private let wsURL = URL(string: "ws://10.19.180.135:8000/ws")!
     private func log(_ items: Any...) { print("[DrKhanVM]", items.map { "\($0)" }.joined(separator: " ")) }
 
     private func ensureConnected() {
